@@ -891,3 +891,32 @@ td b{
     display:none !important;
   }
 }
+
+/* FIX LOGO PAGUYUBAN - jangan tampil sebagai background dashboard */
+.admin-page {
+  background-image: none !important;
+}
+
+.admin-page::before,
+.admin-page::after {
+  background-image: none !important;
+  content: none !important;
+}
+
+.admin-page .admin-content,
+.admin-page .welcome {
+  background-image: none !important;
+}
+
+.admin-page .side-brand .brand-logo {
+  width: 48px !important;
+  height: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  object-fit: contain !important;
+}
+
+.admin-page .brand-logo {
+  display: block;
+}
+
