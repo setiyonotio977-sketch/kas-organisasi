@@ -1,8 +1,9 @@
-import { auth, db, storage } from './firebase.js';
+import { auth, db } from './firebase.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 
-import { ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js';
 import { collection, addDoc, getDocs, getDoc, doc, setDoc, updateDoc, deleteDoc, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+const WORKER_URL = "https://kas-organisasi-upload.setiyonotio977.workers.dev";
+
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)], rupiah=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(Number(n)||0), esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));let data={finance:[],members:[],structure:[],news:[],agendas:[],albums:[],messages:[]}, currentUser;
 const titles={dashboard:'Dashboard',finance:'Keuangan',members:'Anggota',structure:'Struktur',news:'Berita',agenda:'Agenda',gallery:'Galeri',messages:'Pesan',settings:'Pengaturan'};
 onAuthStateChanged(auth,u=>{if(!u){location.href='login.html';return}currentUser=u;$('#adminDate').textContent=new Intl.DateTimeFormat('id-ID',{dateStyle:'full'}).format(new Date());loadAll()});
@@ -23,7 +24,20 @@ function renderAlbums(){$('#albumTable').innerHTML=data.albums.map(x=>`<tr><td><
 function renderMessages(){$('#messageList').innerHTML=data.messages.slice().reverse().map(x=>`<article class="message"><div class="panel-head"><div><b>${esc(x.name)}</b><div>${esc(x.email)}</div></div><small>${x.createdAt?.toDate?x.createdAt.toDate().toLocaleString('id-ID'):''}</small></div><p>${esc(x.message)}</p><a class="btn ghost small" href="mailto:${esc(x.email)}?subject=${encodeURIComponent('Re: Pesan Organisasi')}">Balas Email</a></article>`).join('')||'<div class="panel">Belum ada pesan.</div>'}
 function drawChart(){const c=$('#financeChart');if(!c)return;const ctx=c.getContext('2d'),w=c.clientWidth*devicePixelRatio,h=180*devicePixelRatio;c.width=w;c.height=h;ctx.clearRect(0,0,w,h);const vals=[];let b=0;data.finance.forEach(x=>{b+=(+x.income||0)-(+x.expense||0);vals.push(b)});if(!vals.length){ctx.fillStyle='#8792a6';ctx.font='14px Inter';ctx.fillText('Belum ada transaksi',20,50);return}const max=Math.max(...vals,0),min=Math.min(...vals,0),range=max-min||1;ctx.strokeStyle='#2563eb';ctx.lineWidth=3;ctx.beginPath();vals.forEach((v,i)=>{const x=20+i*(w/dpr(vals.length)),y=155*devicePixelRatio-((v-min)/range)*120*devicePixelRatio;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();function dpr(n){return n?Math.max(1,n):1}}
 function fields(type,item={}){const configs={finance:[['date','Tanggal','date'],['description','Keterangan','text'],['income','Pemasukan','number'],['expense','Pengeluaran','number']],members:[['name','Nama','text'],['position','Jabatan','text'],['phone','Telepon','text'],['email','Email','email'],['gender','Jenis Kelamin','text'],['address','Alamat','text'],['photo','URL Foto','url'],['status','Status','text']],structure:[['order','Urutan','number'],['position','Jabatan','text'],['name','Nama','text']],news:[['title','Judul','text'],['date','Tanggal','date'],['image','URL Foto','url'],['content','Isi','textarea']],agendas:[['title','Judul','text'],['date','Tanggal','date'],['cover','URL Cover','url'],['content','Isi Agenda','textarea']],albums:[['name','Nama Album','text'],['author','Author','text']]};let html=(configs[type]||[]).map(([k,l,t])=>`<label>${l}${t==='textarea'?`<textarea name="${k}" rows="5">${esc(item[k]||'')}</textarea>`:`<input name="${k}" type="${t}" value="${esc(item[k]??'')}">`}</label>`).join('');if(type==='albums'){html+=`<label>Foto Cover<input name="coverFile" type="file" accept="image/jpeg,image/png,image/webp"></label>${item.cover?`<div style="margin-top:-6px"><small style="display:block;color:var(--muted);margin-bottom:8px">Cover saat ini</small><img src="${esc(item.cover)}" alt="Cover saat ini" style="width:120px;height:80px;object-fit:cover;border-radius:12px;border:1px solid var(--line)"></div>`:''}`}return html}
-async function uploadAlbumCover(file){if(!file)return '';if(!file.type.startsWith('image/'))throw new Error('File harus berupa gambar.');if(file.size>10*1024*1024)throw new Error('Ukuran foto maksimal 10 MB.');const safe=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path=`albums/${Date.now()}_${safe}`;const storageRef=ref(storage,path);await uploadBytes(storageRef,file,{contentType:file.type});return await getDownloadURL(storageRef)}
+async function uploadAlbumCover(file){
+  if(!file)return '';
+  const res=await fetch(`${WORKER_URL}/upload`,{
+    method:'POST',
+    headers:{
+      'Content-Type':file.type,
+      'X-Filename':file.name
+    },
+    body:file
+  });
+  const json=await res.json();
+  if(!res.ok)throw new Error(json.error||'Upload gagal');
+  return json.url;
+}
 
 function openModal(type,item={}){const edit=!!item.id;$('#modalRoot').innerHTML=`<div class="modal-backdrop"><div class="modal"><div class="modal-head"><div><span class="eyebrow">${edit?'EDIT':'TAMBAH'}</span><h3>${titles[type]||type}</h3></div><button onclick="window.closeModal()">×</button></div><form id="dataForm" class="form">${fields(type,item)}<div class="modal-actions"><button type="button" class="btn ghost" onclick="window.closeModal()">Batal</button><button class="btn primary" id="saveDataBtn">Simpan</button></div></form></div></div>`;$('#dataForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);const obj={};f.forEach((v,k)=>{if(k!=='coverFile')obj[k]=k==='income'||k==='expense'||k==='order'?Number(v)||0:v});try{$('#saveDataBtn').disabled=true;$('#saveDataBtn').textContent='Menyimpan...';if(type==='albums'){const file=form.elements.coverFile?.files?.[0];if(file){$('#saveDataBtn').textContent='Upload foto...';obj.cover=await uploadAlbumCover(file)}else if(edit){obj.cover=item.cover||''}}obj.updatedAt=serverTimestamp();if(edit)await updateDoc(doc(db,type,item.id),obj);else{obj.createdAt=serverTimestamp();await addDoc(collection(db,type),obj)}closeModal();await loadAll()}catch(err){alert(err.message);$('#saveDataBtn').disabled=false;$('#saveDataBtn').textContent='Simpan'}}}
 window.closeModal=()=>$('#modalRoot').innerHTML='';window.editItem=(type,id)=>openModal(type,data[type].find(x=>x.id===id)||{});window.delItem=async(type,id)=>{if(!confirm('Hapus data ini?'))return;try{await deleteDoc(doc(db,type,id));await loadAll()}catch(e){alert(e.message)}};
