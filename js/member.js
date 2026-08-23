@@ -110,9 +110,11 @@ onAuthStateChanged(auth, async user => {
       expense += Number(x.expense) || 0;
     });
 
+    const balance = income - expense;
+
     $('#income').textContent = rupiah(income);
     $('#expense').textContent = rupiah(expense);
-    $('#balance').textContent = rupiah(income - expense);
+    $('#balance').textContent = rupiah(balance);
 
     $('#financeList').innerHTML =
       finance.map(x => `
