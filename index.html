@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Organisasi Kita</title><link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header class="topbar public-top"><div class="container navwrap"><a class="brand" href="index.html"><span class="brandmark">OK</span><span id="siteName">Organisasi Kita</span></a><button class="menu-btn" id="menuBtn">☰</button><nav id="publicNav"><a href="#home">Home</a><a href="#profil">Profil</a><a href="#informasi">Informasi</a><a href="#agenda">Agenda</a><a href="#galeri">Galeri</a><a href="#kontak">Kontak</a><a class="nav-login" href="login.html">Admin</a></nav></div></header>
+<main>
+<section id="home" class="hero"><div class="container hero-grid"><div><span class="eyebrow">WEBSITE ORGANISASI</span><h1>Aktif, transparan, dan terhubung.</h1><p>Portal resmi organisasi untuk informasi kegiatan, anggota, agenda, galeri, dan transparansi keuangan.</p><div class="hero-actions"><a class="btn primary" href="#agenda">Lihat Agenda</a><a class="btn ghost" href="#profil">Tentang Kami</a></div></div><div class="hero-card"><div class="mini-stat"><span>Saldo Kas</span><strong id="publicBalance">Rp 0</strong></div><div class="mini-row"><div><small>Pemasukan</small><b id="publicIncome">Rp 0</b></div><div><small>Pengeluaran</small><b id="publicExpense">Rp 0</b></div></div></div></div></section>
+<section id="profil" class="section"><div class="container"><div class="section-head"><div><span class="eyebrow">PROFIL</span><h2>Kenali organisasi kami</h2></div></div><div class="profile-grid"><article class="panel"><h3>Visi & Misi</h3><p id="visionText">Membangun organisasi yang aktif, transparan, dan bermanfaat bagi masyarakat.</p><h4>Misi</h4><p id="missionText">Mengembangkan potensi anggota dan menjalankan kegiatan sosial secara berkelanjutan.</p></article><article class="panel"><h3>Struktur Organisasi</h3><div id="publicStructure" class="list"></div></article></div></div></section>
+<section id="informasi" class="section muted"><div class="container"><div class="section-head"><div><span class="eyebrow">INFORMASI</span><h2>Berita terbaru</h2></div></div><div id="newsGrid" class="cards"></div></div></section>
+<section id="agenda" class="section"><div class="container"><div class="section-head"><div><span class="eyebrow">AGENDA</span><h2>Kegiatan mendatang</h2></div><a class="text-link" href="#agenda">Lihat semua</a></div><div id="agendaGrid" class="cards"></div></div></section>
+<section id="galeri" class="section muted"><div class="container"><div class="section-head"><div><span class="eyebrow">GALERI</span><h2>Dokumentasi kegiatan</h2></div></div><div id="albumGrid" class="cards"></div></div></section>
+<section id="kontak" class="section"><div class="container contact-grid"><div><span class="eyebrow">KONTAK</span><h2>Hubungi kami</h2><p id="contactInfo">Alamat organisasi · email@organisasi.id · 08xxxxxxxxxx</p></div><form id="contactForm" class="panel form"><label>Nama<input required name="name"></label><label>Email<input required type="email" name="email"></label><label>Pesan<textarea required name="message" rows="5"></textarea></label><button class="btn primary">Kirim Pesan</button><p class="form-note" id="contactStatus"></p></form></div></section>
+</main><footer><div class="container footer-row"><span>© <span id="year"></span> <span id="footerName">Organisasi Kita</span></span><a href="login.html">Admin</a></div></footer>
+<script type="module" src="js/public.js"></script>
+</body></html>
