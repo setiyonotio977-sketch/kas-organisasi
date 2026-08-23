@@ -99,7 +99,7 @@ window.delItem=async(type,id)=>{
         memberSnap.data();
 
       const uid =
-        String(member.uid || '').trim();
+        String(member.authUid || member.uid || '').trim();
 
       if(!uid) {
         throw new Error(
