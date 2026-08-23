@@ -3,80 +3,203 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dashboard Anggota · Paguyuban Pemuda RW11</title>
-<link rel="icon" type="image/png" href="assets/logo-paguyuban-rw11.png">
+<title>Portal Anggota · Paguyuban Pemuda RW11</title>
 <link rel="stylesheet" href="css/styles.css">
+<style>
+.member-page{min-height:100vh;background:var(--bg)}
+.member-top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+.member-top-inner{height:72px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.member-brand{display:flex;align-items:center;gap:12px}
+.member-brand img{width:44px;height:44px;object-fit:contain}
+.member-brand b{display:block}
+.member-brand small{display:block;color:var(--muted);margin-top:3px}
+.member-main{padding:42px 0 70px}
+.member-hero{margin-bottom:28px}
+.member-hero h1{font-size:42px;margin:8px 0}
+.member-hero p{color:var(--muted);margin:0}
+.member-section{margin-top:28px}
+.member-section h2{font-size:24px;margin-bottom:16px}
+.member-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.member-stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.member-stat span{display:block;color:var(--muted);font-size:13px}
+.member-stat strong{display:block;font-size:25px;margin-top:8px}
+.member-two{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.member-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.member-card h3{margin-bottom:16px}
+.member-list{display:grid;gap:0}
+.member-row{padding:13px 0;border-bottom:1px solid var(--line)}
+.member-row:last-child{border-bottom:0}
+.member-row b{display:block}
+.member-row small{color:var(--muted)}
+.member-table{width:100%;border-collapse:collapse}
+.member-table th,.member-table td{text-align:left;padding:13px;border-bottom:1px solid var(--line)}
+.member-table th{font-size:12px;color:var(--muted);text-transform:uppercase}
+.member-photo{width:110px;height:110px;border-radius:16px;object-fit:cover;border:1px solid var(--line)}
+.member-profile{display:flex;gap:22px;align-items:flex-start}
+.member-profile-info{flex:1}
+.member-profile-info h2{margin:0 0 8px}
+.member-profile-info p{margin:6px 0;color:var(--muted)}
+.member-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.member-news-cover{height:140px;width:100%;object-fit:cover;border-radius:12px;margin-bottom:14px}
+.readonly-note{display:inline-block;background:#eef4ff;color:var(--primary);padding:7px 11px;border-radius:999px;font-size:12px;font-weight:700}
+@media(max-width:900px){
+.member-grid,.member-cards{grid-template-columns:repeat(2,1fr)}
+.member-two{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+.member-grid,.member-cards{grid-template-columns:1fr}
+.member-top-inner{height:auto;padding:12px 0}
+.member-brand small{font-size:11px}
+.member-hero h1{font-size:34px}
+.member-profile{flex-direction:column}
+.member-table{font-size:13px}
+}
+</style>
 </head>
 
-<body class="admin-page">
+<body class="member-page">
 
-<aside class="sidebar">
-<div class="side-brand">
-<img class="brand-logo" src="assets/logo-paguyuban-rw11.png" alt="Logo Paguyuban Pemuda RW11">
-<div>
-<b>Paguyuban Pemuda RW11</b>
-<small>Portal Anggota</small>
-</div>
-</div>
-
-<nav class="side-nav">
-<button class="active" data-view="profile">♙ <span>Profil Saya</span></button>
-<button data-view="info">ℹ <span>Informasi</span></button>
-</nav>
-
-<a class="side-public" href="index.html">↗ Lihat Website</a>
-</aside>
-
-<div class="admin-main">
-
-<header class="admin-top">
-<div>
-<b>Portal Anggota</b>
-<small id="memberEmail"></small>
-</div>
-<button id="memberLogout" class="btn ghost small">Keluar</button>
+<header class="member-top">
+  <div class="container member-top-inner">
+    <div class="member-brand">
+      <img src="assets/logo-paguyuban-rw11.png" alt="Logo">
+      <div>
+        <b>Portal Anggota</b>
+        <small id="memberEmail">Memuat...</small>
+      </div>
+    </div>
+    <button id="logoutBtn" class="btn ghost small">Keluar</button>
+  </div>
 </header>
 
-<main class="admin-content">
+<main class="container member-main">
 
-<section class="view active" data-page="profile">
+  <div class="member-hero">
+    <span class="eyebrow">ANGGOTA</span>
+    <h1>Dashboard Anggota</h1>
+    <p>Informasi Paguyuban Pemuda RW11 — <span class="readonly-note">Mode Read Only</span></p>
+  </div>
 
-<div class="welcome">
-<div>
-<span class="eyebrow">ANGGOTA</span>
-<h1>Profil Saya</h1>
-<p>Informasi keanggotaan Paguyuban Pemuda RW11.</p>
-</div>
-</div>
+  <section class="member-section">
+    <div class="member-grid">
+      <article class="member-stat">
+        <span>Saldo Kas</span>
+        <strong id="balance">Rp 0</strong>
+      </article>
+      <article class="member-stat">
+        <span>Total Pemasukan</span>
+        <strong id="income">Rp 0</strong>
+      </article>
+      <article class="member-stat">
+        <span>Total Pengeluaran</span>
+        <strong id="expense">Rp 0</strong>
+      </article>
+      <article class="member-stat">
+        <span>Jumlah Anggota</span>
+        <strong id="memberCount">0</strong>
+      </article>
+    </div>
+  </section>
 
-<div class="panel" id="profileCard">
-<p>Memuat profil...</p>
-</div>
+  <section class="member-section">
+    <div class="member-card">
+      <h3>Profil Saya</h3>
+      <div class="member-profile">
+        <img id="myPhoto" class="member-photo" src="assets/logo-paguyuban-rw11.png" alt="Foto anggota">
+        <div class="member-profile-info">
+          <h2 id="myName">Memuat...</h2>
+          <p><b>Jabatan:</b> <span id="myPosition">-</span></p>
+          <p><b>Email:</b> <span id="myEmail">-</span></p>
+          <p><b>Telepon:</b> <span id="myPhone">-</span></p>
+          <p><b>Jenis Kelamin:</b> <span id="myGender">-</span></p>
+          <p><b>Alamat:</b> <span id="myAddress">-</span></p>
+          <p><b>Status:</b> <span id="myStatus">-</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
 
-</section>
+  <section class="member-section">
+    <div class="member-two">
 
-<section class="view" data-page="info">
+      <div class="member-card">
+        <h3>Struktur Organisasi</h3>
+        <div id="structureList" class="member-list">
+          <div class="member-row">Memuat...</div>
+        </div>
+      </div>
 
-<div class="page-head">
-<div>
-<span class="eyebrow">INFORMASI</span>
-<h1>Informasi Organisasi</h1>
-</div>
-</div>
+      <div class="member-card">
+        <h3>Agenda Terdekat</h3>
+        <div id="agendaList" class="member-list">
+          <div class="member-row">Memuat...</div>
+        </div>
+      </div>
 
-<div class="panel">
-<h3>Paguyuban Pemuda RW11</h3>
-<p>
-Selamat datang di portal anggota. Melalui halaman ini anggota
-dapat melihat informasi keanggotaan dan informasi organisasi.
-</p>
-</div>
+    </div>
+  </section>
 
-</section>
+  <section class="member-section">
+    <div class="member-card">
+      <h3>Keuangan</h3>
+      <div style="overflow:auto">
+        <table class="member-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Keterangan</th>
+              <th>Pemasukan</th>
+              <th>Pengeluaran</th>
+            </tr>
+          </thead>
+          <tbody id="financeList">
+            <tr><td colspan="4">Memuat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="member-section">
+    <div class="member-card">
+      <h3>Daftar Anggota</h3>
+      <div style="overflow:auto">
+        <table class="member-table">
+          <thead>
+            <tr>
+              <th>Nama</th>
+              <th>Jabatan</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="membersList">
+            <tr><td colspan="3">Memuat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="member-section">
+    <div class="member-card">
+      <h3>Berita Terbaru</h3>
+      <div id="newsList" class="member-cards">
+        <div class="member-row">Memuat...</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="member-section">
+    <div class="member-card">
+      <h3>Galeri</h3>
+      <div id="albumList" class="member-cards">
+        <div class="member-row">Memuat...</div>
+      </div>
+    </div>
+  </section>
 
 </main>
-</div>
 
-<script type="module" src="js/member.js"></script>
+<script type="module" src="js/member.js?v=3"></script>
 </body>
 </html>
