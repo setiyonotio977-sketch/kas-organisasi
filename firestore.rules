@@ -1,65 +1,77 @@
 rules_version = '2';
 
 service cloud.firestore {
-
   match /databases/{database}/documents {
 
     function signedIn() {
       return request.auth != null;
     }
 
-    function admin() {
+    function isAdmin() {
       return signedIn()
-        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.enabled == true;
+        && exists(
+          /databases/$(database)/documents/admins/$(request.auth.uid)
+        )
+        && get(
+          /databases/$(database)/documents/admins/$(request.auth.uid)
+        ).data.enabled == true;
     }
 
+    /*
+     * ADMIN LIST
+     *
+     * User boleh membaca dokumen admins miliknya sendiri.
+     * Ini yang dipakai login.js untuk mengecek apakah dia Admin.
+     */
     match /admins/{uid} {
-      // Setiap user boleh membaca dokumen admin miliknya sendiri.
-      // Ini diperlukan agar login.js bisa mengecek status Admin.
       allow read: if signedIn() && request.auth.uid == uid;
-
-      // Hanya Admin yang sudah terdaftar yang boleh mengubah daftar Admin.
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
+    /*
+     * DATA ORGANISASI
+     *
+     * Semua orang boleh melihat data.
+     * Hanya Admin yang boleh mengubah.
+     */
     match /settings/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /members/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /structure/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /news/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /agendas/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /albums/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /finance/{id} {
       allow read: if true;
-      allow write: if admin();
+      allow write: if isAdmin();
     }
 
     match /messages/{id} {
       allow create: if true;
-      allow read, update, delete: if admin();
+      allow read, update, delete: if isAdmin();
     }
   }
 }
