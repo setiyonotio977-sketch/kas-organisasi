@@ -10,16 +10,15 @@ service cloud.firestore {
 
     function admin() {
       return signedIn()
-        && exists(
-          /databases/$(database)/documents/admins/$(request.auth.uid)
-        )
-        && get(
-          /databases/$(database)/documents/admins/$(request.auth.uid)
-        ).data.enabled == true;
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.enabled == true;
     }
 
     match /admins/{uid} {
+      // Setiap user boleh membaca dokumen admin miliknya sendiri.
+      // Ini diperlukan agar login.js bisa mengecek status Admin.
       allow read: if signedIn() && request.auth.uid == uid;
+
+      // Hanya Admin yang sudah terdaftar yang boleh mengubah daftar Admin.
       allow write: if admin();
     }
 
