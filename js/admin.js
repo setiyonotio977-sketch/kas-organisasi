@@ -11,6 +11,39 @@ $('#logoutBtn').onclick=()=>signOut(auth);
 $('#adminMenu').onclick=()=>$('#sidebar').classList.toggle('open');
 $$('.side-nav button').forEach(b=>b.onclick=()=>show(b.dataset.view));$$('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
 function show(name){$$('.side-nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===name));$$('.view').forEach(x=>x.classList.toggle('active',x.dataset.page===name));$('#adminTitle').textContent=titles[name]||name;$('#sidebar').classList.remove('open')}
+
+async function deleteMemberAccount(uid) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    throw new Error("Sesi Admin sudah berakhir. Silakan login kembali.");
+  }
+
+  const idToken = await user.getIdToken(true);
+
+  const response = await fetch(
+    "https://kas-organisasi-upload.setiyonotio977.workers.dev/delete-member",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${idToken}`
+      },
+      body: JSON.stringify({ uid })
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok || !data.success) {
+    throw new Error(
+      data.error || "Gagal menghapus akun login anggota."
+    );
+  }
+
+  return data;
+}
+
 async function getCol(name,order){const q=order?query(collection(db,name),orderBy(order,'asc')):collection(db,name);const s=await getDocs(q);return s.docs.map(d=>({id:d.id,...d.data()}))}
 async function loadAll(){try{[data.finance,data.members,data.structure,data.news,data.agendas,data.albums,data.messages]=await Promise.all([getCol('finance','date'),getCol('members'),getCol('structure','order'),getCol('news','date'),getCol('agendas','date'),getCol('albums'),getCol('messages','createdAt')]);renderAll()}catch(e){console.error(e);alert('Gagal memuat data. Pastikan Firebase config dan Security Rules sudah benar.\n'+e.message)}}
 function renderAll(){let income=0,expense=0;data.finance.forEach(x=>{income+=+x.income||0;expense+=+x.expense||0});$('#statBalance').textContent=rupiah(income-expense);$('#statIncome').textContent=rupiah(income);$('#statExpense').textContent=rupiah(expense);$('#statMembers').textContent=data.members.length;$('#finBalance').textContent=rupiah(income-expense);$('#finIncome').textContent=rupiah(income);$('#finExpense').textContent=rupiah(expense);renderFinance();renderMembers();renderStructure();renderNews();renderAgenda();renderAlbums();renderMessages();renderDash();drawChart()}
@@ -40,7 +73,113 @@ async function uploadAlbumCover(file){
 }
 
 function openModal(type,item={}){const edit=!!item.id;$('#modalRoot').innerHTML=`<div class="modal-backdrop"><div class="modal"><div class="modal-head"><div><span class="eyebrow">${edit?'EDIT':'TAMBAH'}</span><h3>${titles[type]||type}</h3></div><button onclick="window.closeModal()">×</button></div><form id="dataForm" class="form">${fields(type,item)}<div class="modal-actions"><button type="button" class="btn ghost" onclick="window.closeModal()">Batal</button><button class="btn primary" id="saveDataBtn">Simpan</button></div></form></div></div>`;$('#dataForm').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);const obj={};f.forEach((v,k)=>{if(k!=='coverFile'&&k!=='photoFile'&&k!=='memberPassword')obj[k]=k==='income'||k==='expense'||k==='order'?Number(v)||0:v});try{$('#saveDataBtn').disabled=true;$('#saveDataBtn').textContent='Menyimpan...';if(type==='albums'){const file=form.elements.coverFile?.files?.[0];if(file){$('#saveDataBtn').textContent='Upload foto...';obj.cover=await uploadAlbumCover(file)}else if(edit){obj.cover=item.cover||''}}if(type==='members'){const file=form.elements.photoFile?.files?.[0];if(file){$('#saveDataBtn').textContent='Upload foto...';obj.photo=await uploadAlbumCover(file)}else if(edit){obj.photo=item.photo||''}}if(type==='members'&&!edit){const email=String(obj.email||'').trim().toLowerCase();const password=form.elements.memberPassword?.value||'';if(!email)throw new Error('Email anggota wajib diisi.');if(password.length<6)throw new Error('Password login minimal 6 karakter.');$('#saveDataBtn').textContent='Membuat akun login...';const authRes=await fetch(`${WORKER_URL}/create-member`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});const authJson=await authRes.json();if(!authRes.ok||!authJson.success)throw new Error(authJson.error||'Gagal membuat akun login anggota.');obj.authUid=authJson.uid;obj.email=email}obj.updatedAt=serverTimestamp();if(edit)await updateDoc(doc(db,type,item.id),obj);else{obj.createdAt=serverTimestamp();await addDoc(collection(db,type),obj)}closeModal();await loadAll()}catch(err){alert(err.message);$('#saveDataBtn').disabled=false;$('#saveDataBtn').textContent='Simpan'}}}
-window.closeModal=()=>$('#modalRoot').innerHTML='';window.editItem=(type,id)=>openModal(type,data[type].find(x=>x.id===id)||{});window.delItem=async(type,id)=>{if(!confirm('Hapus data ini?'))return;try{await deleteDoc(doc(db,type,id));await loadAll()}catch(e){alert(e.message)}};
+window.closeModal=()=>$('#modalRoot').innerHTML='';
+
+window.editItem=(type,id)=>
+  openModal(type,data[type].find(x=>x.id===id)||{});
+
+window.delItem=async(type,id)=>{
+  if(!confirm('Hapus data ini?')) return;
+
+  try {
+    // ========================================
+    // KHUSUS ANGGOTA
+    // Hapus Firebase Authentication terlebih dahulu
+    // ========================================
+    if(type === 'members') {
+
+      const memberSnap =
+        await getDoc(doc(db,'members',id));
+
+      if(!memberSnap.exists()) {
+        throw new Error('Data anggota tidak ditemukan.');
+      }
+
+      const member =
+        memberSnap.data();
+
+      const uid =
+        String(member.uid || '').trim();
+
+      if(!uid) {
+        throw new Error(
+          'UID akun anggota tidak ditemukan. Akun login tidak dihapus.'
+        );
+      }
+
+      if(!confirm(
+        'Anggota ini akan dihapus dari data dan akun login Firebase. Lanjutkan?'
+      )) {
+        return;
+      }
+
+      // Ambil token Admin yang sedang login
+      const user = auth.currentUser;
+
+      if(!user) {
+        throw new Error(
+          'Sesi Admin sudah berakhir. Silakan login kembali.'
+        );
+      }
+
+      const idToken =
+        await user.getIdToken(true);
+
+      // Hapus akun Firebase Authentication
+      const response =
+        await fetch(
+          'https://kas-organisasi-upload.setiyonotio977.workers.dev/delete-member',
+          {
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json',
+              'Authorization':`Bearer ${idToken}`
+            },
+            body:JSON.stringify({uid})
+          }
+        );
+
+      const result =
+        await response.json();
+
+      if(!response.ok || !result.success) {
+        throw new Error(
+          result.error ||
+          'Gagal menghapus akun login anggota.'
+        );
+      }
+
+      // Auth berhasil dihapus.
+      // Sekarang hapus dokumen Firestore.
+      await deleteDoc(
+        doc(db,'members',id)
+      );
+
+      alert(
+        'Anggota dan akun login berhasil dihapus.'
+      );
+
+      await loadAll();
+      return;
+    }
+
+    // ========================================
+    // DATA LAIN
+    // ========================================
+    await deleteDoc(
+      doc(db,type,id)
+    );
+
+    await loadAll();
+
+  } catch(e) {
+    console.error(e);
+    alert(
+      'Gagal menghapus data:\n' +
+      (e.message || e)
+    );
+  }
+};
 $$('[data-action]').forEach(b=>b.onclick=()=>{const map={'new-finance':'finance','new-member':'members','new-structure':'structure','new-news':'news','new-agenda':'agendas','new-album':'albums'};openModal(map[b.dataset.action])});['memberSearch','newsSearch','agendaSearch','financeSearch'].forEach(id=>$('#'+id)?.addEventListener('input',renderAll));
 $('#saveSettings').onclick=async()=>{const f=new FormData($('#settingsForm')),obj={};f.forEach((v,k)=>obj[k]=v);obj.updatedAt=serverTimestamp();try{await setDoc(doc(db,'settings','site'),obj,{merge:true});alert('Pengaturan tersimpan.')}catch(e){alert(e.message)}};
 async function loadSettings(){try{const s=await getDoc(doc(db,'settings','site'));if(s.exists()){const f=$('#settingsForm');Object.entries(s.data()).forEach(([k,v])=>{if(f.elements[k])f.elements[k].value=v||''})}}catch(e){console.warn(e)}}
