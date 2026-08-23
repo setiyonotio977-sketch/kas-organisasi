@@ -727,3 +727,167 @@ td b{
     width:100%;
   }
 }
+
+/* ===== RESPONSIVE ADMIN SIDEBAR FIX ===== */
+@media (max-width: 900px){
+  .admin-page{
+    position:relative;
+    overflow-x:hidden;
+  }
+
+  .sidebar{
+    position:fixed;
+    left:-285px;
+    top:0;
+    bottom:0;
+    width:270px;
+    flex:0 0 270px;
+    z-index:100;
+    transition:left .25s ease;
+    box-shadow:10px 0 30px rgba(0,0,0,.18);
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .admin-main{
+    width:100%;
+    min-width:0;
+  }
+
+  .admin-top{
+    padding:0 15px;
+  }
+
+  .admin-menu-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:42px;
+    height:42px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    font-size:22px;
+    margin-right:10px;
+  }
+
+  .admin-top-left{
+    display:flex;
+    align-items:center;
+    min-width:0;
+  }
+
+  .admin-content{
+    width:100%;
+    padding:20px 15px;
+  }
+}
+
+@media (min-width:901px){
+  .admin-menu-btn{
+    display:none;
+  }
+}
+
+@media (max-width:600px){
+  .admin-top{
+    height:64px;
+  }
+
+  .admin-content{
+    padding:15px 12px;
+  }
+
+  .welcome h1{
+    font-size:28px;
+  }
+
+  .stats,
+  .stats.compact{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .dashboard-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* ===== FIX SIDEBAR ADMIN MOBILE ===== */
+@media (max-width: 900px){
+  .admin-page{
+    overflow-x:hidden;
+  }
+
+  .sidebar{
+    position:fixed;
+    left:-285px;
+    top:0;
+    bottom:0;
+    width:270px;
+    z-index:1000;
+    transition:left .25s ease;
+    box-shadow:10px 0 30px rgba(0,0,0,.20);
+  }
+
+  .sidebar.open{
+    left:0;
+  }
+
+  .admin-main{
+    width:100%;
+    min-width:0;
+  }
+
+  .admin-top{
+    display:flex;
+    align-items:center;
+    padding:0 15px;
+  }
+
+  .menu-btn{
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    width:42px;
+    height:42px;
+    margin-right:10px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    color:var(--text);
+    font-size:22px;
+  }
+
+  .admin-content{
+    width:100%;
+    min-width:0;
+    padding:20px 15px;
+  }
+}
+
+@media (max-width:600px){
+  .admin-content{
+    padding:15px 12px;
+  }
+
+  .welcome h1{
+    font-size:28px;
+    line-height:1.15;
+  }
+
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .dashboard-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media (min-width:901px){
+  .menu-btn{
+    display:none !important;
+  }
+}
