@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard Anggota · Paguyuban Pemuda RW11</title>
+<link rel="icon" type="image/png" href="assets/logo-paguyuban-rw11.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="admin-page">
+
+<aside class="sidebar">
+<div class="side-brand">
+<img class="brand-logo" src="assets/logo-paguyuban-rw11.png" alt="Logo Paguyuban Pemuda RW11">
+<div>
+<b>Paguyuban Pemuda RW11</b>
+<small>Portal Anggota</small>
+</div>
+</div>
+
+<nav class="side-nav">
+<button class="active" data-view="profile">♙ <span>Profil Saya</span></button>
+<button data-view="info">ℹ <span>Informasi</span></button>
+</nav>
+
+<a class="side-public" href="index.html">↗ Lihat Website</a>
+</aside>
+
+<div class="admin-main">
+
+<header class="admin-top">
+<div>
+<b>Portal Anggota</b>
+<small id="memberEmail"></small>
+</div>
+<button id="memberLogout" class="btn ghost small">Keluar</button>
+</header>
+
+<main class="admin-content">
+
+<section class="view active" data-page="profile">
+
+<div class="welcome">
+<div>
+<span class="eyebrow">ANGGOTA</span>
+<h1>Profil Saya</h1>
+<p>Informasi keanggotaan Paguyuban Pemuda RW11.</p>
+</div>
+</div>
+
+<div class="panel" id="profileCard">
+<p>Memuat profil...</p>
+</div>
+
+</section>
+
+<section class="view" data-page="info">
+
+<div class="page-head">
+<div>
+<span class="eyebrow">INFORMASI</span>
+<h1>Informasi Organisasi</h1>
+</div>
+</div>
+
+<div class="panel">
+<h3>Paguyuban Pemuda RW11</h3>
+<p>
+Selamat datang di portal anggota. Melalui halaman ini anggota
+dapat melihat informasi keanggotaan dan informasi organisasi.
+</p>
+</div>
+
+</section>
+
+</main>
+</div>
+
+<script type="module" src="js/member.js"></script>
+</body>
+</html>

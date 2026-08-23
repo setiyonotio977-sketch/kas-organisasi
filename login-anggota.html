@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login Anggota · Paguyuban Pemuda RW11</title>
+<link rel="icon" type="image/png" href="assets/logo-paguyuban-rw11.png">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="auth-page">
+<div class="auth-card">
+<a class="brand center" href="index.html">
+<img class="brand-logo" src="assets/logo-paguyuban-rw11.png" alt="Logo Paguyuban Pemuda RW11">
+<span>Paguyuban Pemuda RW11</span>
+</a>
+
+<h1>Login Anggota</h1>
+<p>Masuk untuk melihat profil dan informasi keanggotaan Anda.</p>
+
+<form id="memberLoginForm" class="form">
+<label>Email
+<input type="email" name="email" required autocomplete="email">
+</label>
+
+<label>Password
+<input type="password" name="password" required autocomplete="current-password">
+</label>
+
+<button class="btn primary full">Masuk sebagai Anggota</button>
+<p id="memberLoginStatus" class="form-note"></p>
+</form>
+
+<a class="back" href="index.html">← Kembali ke website</a>
+</div>
+
+<script type="module" src="js/member-login.js"></script>
+</body>
+</html>
