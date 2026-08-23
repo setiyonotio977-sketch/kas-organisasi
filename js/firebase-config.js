@@ -1,9 +1,9 @@
-// Ganti nilai di bawah dengan konfigurasi Web App dari Firebase Console.
 export const firebaseConfig = {
-  apiKey: "GANTI_API_KEY",
-  authDomain: "GANTI_PROJECT.firebaseapp.com",
-  projectId: "GANTI_PROJECT_ID",
-  storageBucket: "GANTI_PROJECT.firebasestorage.app",
-  messagingSenderId: "GANTI_SENDER_ID",
-  appId: "GANTI_APP_ID"
+  apiKey: "AIzaSyAuB7HSfUfrHqEKjcofFQt1WM--QJ4TbH4",
+  authDomain: "kas-organisasi-setiyono.firebaseapp.com",
+  projectId: "kas-organisasi-setiyono",
+  storageBucket: "kas-organisasi-setiyono.firebasestorage.app",
+  messagingSenderId: "1071441520439",
+  appId: "1:1071441520439:web:07e277cd3cbd9db58c5cb2",
+  measurementId: "G-76WEB5HPPK"
 };
