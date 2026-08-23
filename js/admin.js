@@ -33,7 +33,25 @@ async function deleteMemberAccount(uid) {
     }
   );
 
-  const data = await response.json();
+  let data = {};
+  try {
+    data = await response.json();
+  } catch (_) {}
+
+  // Akun Authentication sudah tidak ada.
+  // Itu bukan alasan untuk menggagalkan penghapusan data anggota.
+  if (
+    data.code === "USER_NOT_FOUND" ||
+    data.error === "USER_NOT_FOUND"
+  ) {
+    console.warn(
+      "Akun Firebase Authentication sudah tidak ada. Lanjut hapus data anggota."
+    );
+    return {
+      success: true,
+      userNotFound: true
+    };
+  }
 
   if (!response.ok || !data.success) {
     throw new Error(
