@@ -32,10 +32,10 @@ onAuthStateChanged(auth, async user => {
         'Akun ini bukan akun Admin. Gunakan Login Anggota.';
     }
   } catch (err) {
-    console.error(err);
+    console.error('ADMIN CHECK ERROR:', err);
     await signOut(auth);
     status.textContent =
-      'Tidak dapat memeriksa hak akses Admin.';
+      `Gagal cek Admin: ${err.code || 'unknown'} — ${err.message || err}`;
   }
 });
 
