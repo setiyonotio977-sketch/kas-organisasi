@@ -143,31 +143,11 @@ window.delItem=async(type,id)=>{
       const idToken =
         await user.getIdToken(true);
 
-      // Hapus akun Firebase Authentication
-      const response =
-        await fetch(
-          'https://kas-organisasi-upload.setiyonotio977.workers.dev/delete-member',
-          {
-            method:'POST',
-            headers:{
-              'Content-Type':'application/json',
-              'Authorization':`Bearer ${idToken}`
-            },
-            body:JSON.stringify({uid})
-          }
-        );
+      // Hapus akun Firebase Authentication.
+      // Jika akun Auth sudah tidak ada, tetap lanjut hapus
+      // dokumen anggota dari Firestore.
+      await deleteMemberAccount(uid);
 
-      const result =
-        await response.json();
-
-      if(!response.ok || !result.success) {
-        throw new Error(
-          result.error ||
-          'Gagal menghapus akun login anggota.'
-        );
-      }
-
-      // Auth berhasil dihapus.
       // Sekarang hapus dokumen Firestore.
       await deleteDoc(
         doc(db,'members',id)
